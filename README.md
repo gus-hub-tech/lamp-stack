@@ -2,7 +2,6 @@
 How To Install LAMP Stack (Linux, Apache, MySQL, PHP) 
 
 
-
 ## Overview
 
 This guide provides complete instructions for setting up a LAMP (Linux, Apache, MySQL/MariaDB, PHP) stack on Amazon Linux 2023. The LAMP stack is a popular open-source web development platform used to host dynamic websites and applications.
@@ -56,6 +55,7 @@ sudo systemctl start httpd
 sudo systemctl enable httpd
 sudo systemctl status httpd
 ```
+<img width="947" height="370" alt="httpd" src="https://github.com/user-attachments/assets/d58293af-c0aa-4551-8d3f-287d23f18daa" />
 
 #### Configure AWS Security Group
 
@@ -63,6 +63,9 @@ Make sure your EC2 Security Group allows inbound traffic:
 - **Port 80** (HTTP) - from 0.0.0.0/0
 - **Port 443** (HTTPS) - from 0.0.0.0/0
 - **Port 22** (SSH) - from your IP
+
+<img width="1375" height="637" alt="security" src="https://github.com/user-attachments/assets/0b29e256-a542-42b4-ba2a-a274b07bec3c" />
+
 
 #### Configure Firewall (Optional)
 
@@ -85,6 +88,9 @@ http://your_ec2_public_ip
 ```
 
 You should see the Apache test page.
+
+<img width="957" height="272" alt="test" src="https://github.com/user-attachments/assets/3f1788f6-c3db-4f06-a066-4ace71595c97" />
+
 
 #### Find Your EC2 Public IP
 
@@ -109,6 +115,8 @@ sudo systemctl start mariadb
 sudo systemctl enable mariadb
 sudo systemctl status mariadb
 ```
+<img width="960" height="376" alt="mariadb" src="https://github.com/user-attachments/assets/653074ad-7331-441a-99b2-376ed1c9fce1" />
+
 
 #### Secure MariaDB Installation
 
@@ -149,6 +157,8 @@ Exit with:
 ```sql
 exit
 ```
+<img width="952" height="275" alt="mariadb-access" src="https://github.com/user-attachments/assets/8d54758c-c6aa-46df-af03-a7743bc76276" />
+
 
 ### Step 4: Install PHP
 
@@ -168,6 +178,7 @@ Expected output:
 ```
 PHP 8.2.x (cli) (built: ...)
 ```
+<img width="952" height="667" alt="php" src="https://github.com/user-attachments/assets/ccd74719-3390-414c-acf2-843eeb71d9f3" />
 
 #### Restart Apache
 
@@ -256,15 +267,37 @@ nano /var/www/your_domain/index.html
 ```
 
 ```html
-<html>
-  <head>
-    <title>your_domain website</title>
-  </head>
-  <body>
-    <h1>Hello World from Amazon Linux 2023!</h1>
-    <p>This is the landing page of <strong>your_domain</strong>.</p>
-  </body>
-</html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>lamp_stack website</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #1e3c72, #2a5298);
+      color: #fff;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    h1 {
+      font-size: 3rem;
+      margin-bottom: 0.5rem;
+      animation: fadeInDown 2s ease-in-out;
+    }
+
+    p {
+      font-size: 1.5rem;
+      animation: fadeInUp 2s ease-in-out;
+</body>ello World from Amazon Linux 2023!</h1> 40px #00ffff; } #00e6e6;
+</html>is is the landing page of my <strong>lamp-stack</strong>.</p>
+<b<div class="glow">🚀 Powered by LAMP & AWS</div>#00e6e6; }
+
 ```
 
 For quick testing with default directory:
@@ -272,6 +305,9 @@ For quick testing with default directory:
 ```bash
 echo "<h1>Hello from Amazon Linux 2023</h1>" | sudo tee /var/www/html/index.html
 ```
+
+https://github.com/user-attachments/assets/703e2627-931f-4e6a-a7cd-48a468700aae
+
 
 ### Step 6: Test PHP Processing
 
@@ -291,6 +327,8 @@ Access it in your browser:
 ```
 http://your_ec2_public_ip/info.php
 ```
+<img width="957" height="610" alt="php-info" src="https://github.com/user-attachments/assets/6edcec96-0727-406b-9cc9-fa1e44fe8d9c" />
+
 
 **Important:** Delete this file after testing as it exposes sensitive information:
 ```bash
@@ -317,6 +355,8 @@ FLUSH PRIVILEGES;
 exit
 ```
 
+<img width="910" height="261" alt="data-base" src="https://github.com/user-attachments/assets/736f8727-5550-478b-80e1-08ffdbe6e2ee" />
+
 Test user login:
 
 ```bash
@@ -328,10 +368,10 @@ Create test table:
 ```sql
 USE example_database;
 
-CREATE TABLE todo_list (
-    item_id INT AUTO_INCREMENT,
-    content VARCHAR(255),
-    PRIMARY KEY(item_id)
+CREATE TABLE example_database.todo_list (
+  item_id INT AUTO_INCREMENT,
+  content VARCHAR(255),
+  PRIMARY KEY(item_id)
 );
 
 INSERT INTO todo_list (content) VALUES ("My first important item");
@@ -342,7 +382,12 @@ SELECT * FROM todo_list;
 exit
 ```
 
+<img width="952" height="312" alt="test-table" src="https://github.com/user-attachments/assets/a0edc07a-ac5e-4b12-b12b-42064e7ebc7c" />
+
+
 #### Create PHP Database Test Script
+
+The script will connect to MySQL and query for your content. 
 
 ```bash
 sudo nano /var/www/html/todo_list.php
@@ -374,7 +419,10 @@ Access in browser:
 http://your_ec2_public_ip/todo_list.php
 ```
 
-## Advanced Configuration
+<img width="952" height="373" alt="todo" src="https://github.com/user-attachments/assets/5b01a3dd-33a7-4ba0-b107-ea92582aa6a1" />
+
+
+## Advanced Configuration [Optional]
 
 ### Remote MariaDB Access
 
