@@ -13,6 +13,117 @@ This guide provides complete instructions for setting up a LAMP (Linux, Apache, 
 - **M**ySQL/MariaDB: Relational database management system
 - **P**HP: Server-side scripting language
 
+## Architecture Overview
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                          AWS Cloud                             │
+│  ┌───────────────────────────────────────────────────────────┐  │
+│  │                    VPC (Virtual Private Cloud)           │  │
+│  │                                                           │  │
+│  │  ┌─────────────────────────────────────────────────────┐  │  │
+│  │  │              Availability Zone                      │  │  │
+│  │  │                                                     │  │  │
+│  │  │  ┌───────────────────────────────────────────────┐  │  │  │
+│  │  │  │            EC2 Instance (t3.micro)           │  │  │  │
+│  │  │  │         Amazon Linux 2023.9.20251208         │  │  │  │
+│  │  │  │                                               │  │  │  │
+│  │  │  │  ┌─────────────────────────────────────────┐  │  │  │  │
+│  │  │  │  │              Web Layer                 │  │  │  │  │
+│  │  │  │  │                                         │  │  │  │  │
+│  │  │  │  │  ┌─────────────────────────────────┐    │  │  │  │  │
+│  │  │  │  │  │         Apache HTTP Server      │    │  │  │  │  │
+│  │  │  │  │  │            (httpd 2.4.x)        │    │  │  │  │  │
+│  │  │  │  │  │                                 │    │  │  │  │  │
+│  │  │  │  │  │  • Virtual Hosts               │    │  │  │  │  │
+│  │  │  │  │  │  • SSL/TLS Support             │    │  │  │  │  │
+│  │  │  │  │  │  • .htaccess Support           │    │  │  │  │  │
+│  │  │  │  │  └─────────────────────────────────┘    │  │  │  │  │
+│  │  │  │  └─────────────────────────────────────────┘  │  │  │  │
+│  │  │  │                                               │  │  │  │
+│  │  │  │  ┌─────────────────────────────────────────┐  │  │  │  │
+│  │  │  │  │           Application Layer             │  │  │  │  │
+│  │  │  │  │                                         │  │  │  │  │
+│  │  │  │  │  ┌─────────────────────────────────┐    │  │  │  │  │
+│  │  │  │  │  │            PHP 8.2.x           │    │  │  │  │  │
+│  │  │  │  │  │                                 │    │  │  │  │  │
+│  │  │  │  │  │  • php-mysqlnd                 │    │  │  │  │  │
+│  │  │  │  │  │  • php-fpm                     │    │  │  │  │  │
+│  │  │  │  │  │  • php-curl, php-gd, php-xml   │    │  │  │  │  │
+│  │  │  │  │  │  • php-opcache (performance)    │    │  │  │  │  │
+│  │  │  │  │  └─────────────────────────────────┘    │  │  │  │  │
+│  │  │  │  └─────────────────────────────────────────┘  │  │  │  │
+│  │  │  │                                               │  │  │  │
+│  │  │  │  ┌─────────────────────────────────────────┐  │  │  │  │
+│  │  │  │  │            Database Layer               │  │  │  │  │
+│  │  │  │  │                                         │  │  │  │  │
+│  │  │  │  │  ┌─────────────────────────────────┐    │  │  │  │  │
+│  │  │  │  │  │        MariaDB 10.5.x          │    │  │  │  │  │
+│  │  │  │  │  │      (MySQL Compatible)         │    │  │  │  │  │
+│  │  │  │  │  │                                 │    │  │  │  │  │
+│  │  │  │  │  │  • Secure Installation         │    │  │  │  │  │
+│  │  │  │  │  │  • User Management             │    │  │  │  │  │
+│  │  │  │  │  │  • Database Storage            │    │  │  │  │  │
+│  │  │  │  │  └─────────────────────────────────┘    │  │  │  │  │
+│  │  │  │  └─────────────────────────────────────────┘  │  │  │  │
+│  │  │  │                                               │  │  │  │
+│  │  │  │  ┌─────────────────────────────────────────┐  │  │  │  │
+│  │  │  │  │            File System                  │  │  │  │  │
+│  │  │  │  │                                         │  │  │  │  │
+│  │  │  │  │  • /var/www/html/ (Web Root)            │  │  │  │  │
+│  │  │  │  │  • /etc/httpd/ (Apache Config)          │  │  │  │  │
+│  │  │  │  │  • /var/log/httpd/ (Apache Logs)        │  │  │  │  │
+│  │  │  │  │  • /etc/my.cnf (MariaDB Config)         │  │  │  │  │
+│  │  │  │  └─────────────────────────────────────────┘  │  │  │  │
+│  │  │  └───────────────────────────────────────────────┘  │  │  │
+│  │  └─────────────────────────────────────────────────────┘  │  │
+│  └───────────────────────────────────────────────────────────┘  │
+└─────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────┐
+│                      Security Groups                           │
+├─────────────────────────────────────────────────────────────────┤
+│  Port 22  (SSH)    │ Your IP Address                          │
+│  Port 80  (HTTP)   │ 0.0.0.0/0 (Internet)                    │
+│  Port 443 (HTTPS)  │ 0.0.0.0/0 (Internet)                    │
+│  Port 3306 (MySQL) │ Restricted IPs (Optional)                │
+└─────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────┐
+│                        Data Flow                               │
+└─────────────────────────────────────────────────────────────────┘
+
+    Internet Users
+         │
+         ▼
+   ┌─────────────┐    HTTP/HTTPS     ┌─────────────────┐
+   │   Browser   │ ◄──────────────── │  Apache Server  │
+   └─────────────┘    (Port 80/443)  │    (httpd)      │
+         │                           └─────────────────┘
+         │                                     │
+         ▼                                     ▼
+   Static Content                        ┌─────────────────┐
+   (HTML, CSS, JS)                       │   PHP Engine    │
+                                         │   (php-fpm)     │
+                                         └─────────────────┘
+                                                   │
+                                                   ▼
+                                         ┌─────────────────┐
+                                         │   MariaDB       │
+                                         │   Database      │
+                                         │  (Port 3306)    │
+                                         └─────────────────┘
+```
+
+### Key Components:
+
+- **AWS EC2 Instance**: Hosts the entire LAMP stack on Amazon Linux 2023
+- **Apache HTTP Server**: Handles web requests and serves static/dynamic content
+- **PHP Engine**: Processes server-side scripts and connects to database
+- **MariaDB Database**: Stores application data with MySQL compatibility
+- **Security Groups**: AWS firewall rules controlling network access
+- **File System**: Organized directory structure for web files and configurations
+
 ## System Information
 
 This guide is specifically designed for:
